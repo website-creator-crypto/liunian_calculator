@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>流年 / 流月 / 流日 Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 760px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #f7f7f7;
+      color: #222;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    label {
+      display: block;
+      margin-top: 14px;
+      font-weight: bold;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    button {
+      margin-top: 20px;
+      background: #222;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #444;
+    }
+
+    .result {
+      margin-top: 28px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 16px;
+      white-space: pre-wrap;
+      font-family: "Courier New", monospace;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      min-height: 120px;
+      line-height: 1.8;
+      font-size: 18px;
+    }
+
+    .small-note {
+      text-align: center;
+      margin-top: 14px;
+      color: #666;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>流年 / 流月 / 流日 Calculator</h1>
+
+  <div class="card">
+    <label for="userd">Day(日)</label>
+    <input type="number" id="userd" min="1" max="31" placeholder="Enter day">
+
+    <label for="userm">Month(月)</label>
+    <input type="number" id="userm" min="1" max="12" placeholder="Enter month">
+
+    <label for="userc">Century(世)</label>
+    <input type="number" id="userc" placeholder="Example: 20">
+
+    <label for="usery">Year(年)</label>
+    <input type="number" id="usery" min="0" max="99" placeholder="Example: 05 or 26">
+
+    <label for="ans">Choose Calculation</label>
+    <select id="ans">
+      <option value="1">流年</option>
+      <option value="2">流月</option>
+      <option value="3">流日</option>
+    </select>
+
+    <button onclick="calculate()">Calculate</button>
+
+    <div class="small-note">
+      Current date is taken automatically from your browser.
+    </div>
+  </div>
+
+  <div class="result" id="result">Your result will appear here...</div>
+
+  <script>
+    function reduceNum(n) {
+      while (n >= 10) {
+        n = (n % 10) + Math.floor((n - (n % 10)) / 10);
+      }
+      return parseInt(n);
+    }
+
+    function pad2(n) {
+      return String(n).padStart(2, '0');
+    }
+
+    function calculate() {
+      const resultBox = document.getElementById("result");
+
+      let userd = parseInt(document.getElementById("userd").value);
+      let userm = parseInt(document.getElementById("userm").value);
+      let userc = parseInt(document.getElementById("userc").value);
+      let usery = parseInt(document.getElementById("usery").value);
+      let ans = parseInt(document.getElementById("ans").value);
+
+      if (
+        isNaN(userd) || isNaN(userm) || isNaN(userc) || isNaN(usery)
+      ) {
+        resultBox.textContent = "Please fill in all fields first.";
+        return;
+      }
+
+      const now = new Date();
+      const nowd = now.getDate();
+      const nowm = now.getMonth() + 1;
+      const fullYear = now.getFullYear();
+      const nowy = fullYear % 100;
+      const nowc = Math.floor((fullYear - nowy) / 100);
+
+      let no1 = 0, no2 = 0, no3 = 0, no4 = 0, no5 = 0, no6 = 0, no7 = 0;
+      let toprint = "";
+      let lines = [];
+
+      if (ans === 1) {
+        lines.push(`      ${nowc} ${pad2(nowy)}`);
+        lines.push(`${pad2(userd)} ${pad2(userm)} ${userc} ${pad2(usery)}`);
+        lines.push(`-----------`);
+
+        if (userd >= 10) {
+          no1 = userd % 10 + Math.floor((userd - (userd % 10)) / 10);
+          toprint += `${parseInt(no1)}  `;
+        } else {
+          no1 = userd;
+          toprint += `${parseInt(userd)}  `;
+        }
+        no1 = reduceNum(no1);
+
+        if (userm >= 10) {
+          no2 = userm % 10 + Math.floor((userm - (userm % 10)) / 10);
+          toprint += `${parseInt(no2)} `;
+        } else {
+          no2 = userm;
+          toprint += `${parseInt(userm)} `;
+        }
+        no2 = reduceNum(no2);
+
+        no3 = reduceNum(
+          (userc % 10 + Math.floor((userc - (userc % 10)) / 10)) +
+          (nowc % 10 + Math.floor((nowc - (nowc % 10)) / 10))
+        );
+
+        no4 = reduceNum(
+          (usery % 10 + Math.floor((usery - (usery % 10)) / 10)) +
+          (nowy % 10 + Math.floor((nowy - (nowy % 10)) / 10))
+        );
+
+        lines.push(`${toprint}${parseInt(no3)}  ${parseInt(no4)}`);
+
+        no5 = reduceNum(no1 + no2);
+        no6 = reduceNum(no3 + no4);
+        lines.push(` ${parseInt(no5)}   ${parseInt(no6)}`);
+
+        no7 = reduceNum(no5 + no6);
+        lines.push(`    ${parseInt(no7)}`);
+
+      } else if (ans === 2) {
+        lines.push(`   ${pad2(nowm)} ${nowc} ${pad2(nowy)}`);
+        lines.push(`${pad2(userd)} ${pad2(userm)} ${userc} ${pad2(usery)}`);
+        lines.push(`-----------`);
+
+        if (userd >= 10) {
+          no1 = userd % 10 + Math.floor((userd - (userd % 10)) / 10);
+          toprint += `${parseInt(no1)}  `;
+        } else {
+          no1 = userd;
+          toprint += `${parseInt(userd)}  `;
+        }
+        no1 = reduceNum(no1);
+
+        no2 = reduceNum(
+          (userm % 10 + Math.floor((userm - (userm % 10)) / 10)) +
+          (nowm % 10 + Math.floor((nowm - (nowm % 10)) / 10))
+        );
+
+        no3 = reduceNum(
+          (userc % 10 + Math.floor((userc - (userc % 10)) / 10)) +
+          (nowc % 10 + Math.floor((nowc - (nowc % 10)) / 10))
+        );
+
+        no4 = reduceNum(
+          (usery % 10 + Math.floor((usery - (usery % 10)) / 10)) +
+          (nowy % 10 + Math.floor((nowy - (nowy % 10)) / 10))
+        );
+
+        toprint += `${parseInt(no2)}`;
+        lines.push(`${toprint} ${parseInt(no3)} ${parseInt(no4)}`);
+
+        no5 = reduceNum(no1 + no2);
+        no6 = reduceNum(no3 + no4);
+        lines.push(` ${parseInt(no5)}   ${parseInt(no6)}`);
+
+        no7 = reduceNum(no5 + no6);
+        lines.push(`    ${parseInt(no7)}`);
+
+      } else {
+        lines.push(`${pad2(nowd)} ${pad2(nowm)} ${nowc} ${pad2(nowy)}`);
+        lines.push(`${pad2(userd)} ${pad2(userm)} ${userc} ${pad2(usery)}`);
+        lines.push(`-----------`);
+
+        no1 = reduceNum(
+          (userd % 10 + Math.floor((userd - (userd % 10)) / 10)) +
+          (nowd % 10 + Math.floor((nowd - (nowd % 10)) / 10))
+        );
+
+        no2 = reduceNum(
+          (userm % 10 + Math.floor((userm - (userm % 10)) / 10)) +
+          (nowm % 10 + Math.floor((nowm - (nowm % 10)) / 10))
+        );
+
+        no3 = reduceNum(
+          (userc % 10 + Math.floor((userc - (userc % 10)) / 10)) +
+          (nowc % 10 + Math.floor((nowc - (nowc % 10)) / 10))
+        );
+
+        no4 = reduceNum(
+          (usery % 10 + Math.floor((usery - (usery % 10)) / 10)) +
+          (nowy % 10 + Math.floor((nowy - (nowy % 10)) / 10))
+        );
+
+        lines.push(`${parseInt(no1)} ${parseInt(no2)} ${parseInt(no3)} ${parseInt(no4)}`);
+
+        no5 = reduceNum(no1 + no2);
+        no6 = reduceNum(no3 + no4);
+        lines.push(` ${parseInt(no5)}   ${parseInt(no6)}`);
+
+        no7 = reduceNum(no5 + no6);
+        lines.push(`    ${parseInt(no7)}`);
+      }
+
+      resultBox.textContent = lines.join("\n");
+    }
+  </script>
+</body>
+</html>
